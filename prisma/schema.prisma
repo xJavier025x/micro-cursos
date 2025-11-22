@@ -1,0 +1,116 @@
+datasource db {
+  provider = "postgresql"
+  //url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+enum Role {
+  EMPLOYEE
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(EMPLOYEE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  progress    UserProgress[]
+  quizResults QuizResult[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  title       String
+  content     String? // Markdown text
+  videoUrl    String?
+  order       Int      @default(0)
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  quiz         Quiz?
+  userProgress UserProgress[]
+}
+
+model Quiz {
+  id        String   @id @default(cuid())
+  lessonId  String   @unique
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  questions   Question[]
+  quizResults QuizResult[]
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  text      String
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  options Option[]
+  userAnswers UserAnswer[]
+}
+
+model Option {
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean  @default(false)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userAnswers UserAnswer[]
+}
+
+model UserProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+}
+
+model QuizResult {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  score     Int // Percentage or points
+  createdAt DateTime @default(now())
+  answers   UserAnswer[]
+}
+
+model UserAnswer {
+  id           String     @id @default(cuid())
+  quizResultId String
+  quizResult   QuizResult @relation(fields: [quizResultId], references: [id], onDelete: Cascade)
+  questionId   String
+  question     Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  optionId     String
+  option       Option     @relation(fields: [optionId], references: [id], onDelete: Cascade)
+}
