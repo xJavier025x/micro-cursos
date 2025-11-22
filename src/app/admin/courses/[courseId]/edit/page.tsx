@@ -1,108 +1,55 @@
-'use client';
-
-import { getCourseById, updateCourse } from '@/actions/courses';
-import { Course } from '@prisma/client';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Save, ArrowLeft } from 'lucide-react';
+import { getCurrentUser } from '@/actions/users';
+import { getCourseById } from '@/actions/courses';
+import { redirect } from 'next/navigation';
+import { CourseForm } from '@/components/admin/CourseForm';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
-export default function EditCoursePage({ params }: { params: Promise<{ courseId: string }> }) {
-  const router = useRouter();
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [courseId, setCourseId] = useState<string | null>(null);
+async function requireAdmin() {
+  const user = await getCurrentUser();
+  if (!user) redirect('/auth/login');
+  if (user.role !== 'ADMIN') redirect('/dashboard');
+}
 
-  useEffect(() => {
-    params.then((p) => {
-        setCourseId(p.courseId);
-        getCourseById(p.courseId).then((c) => {
-            if (c) setCourse(c);
-            setLoading(false);
-        });
-    });
-  }, [params]);
+interface EditCoursePageProps {
+  params: { courseId: string };
+}
 
-  async function handleSubmit(formData: FormData) {
-    if (!courseId) return;
-    setSaving(true);
-    setError(null);
+export default async function EditCoursePage({ params }: EditCoursePageProps) {
+  await requireAdmin();
+  const course = await getCourseById(params.courseId);
 
-    const res = await updateCourse(courseId, formData);
-
-    if (res?.error) {
-      if (typeof res.error === 'string') {
-        setError(res.error);
-      } else {
-        setError('Error de validación');
-      }
-      setSaving(false);
-    } else {
-      router.push('/admin/courses');
-      router.refresh();
-    }
+  if (!course) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center text-slate-600">
+          <p>No se encontró el curso solicitado.</p>
+          <Link href="/admin/courses" className="mt-4 inline-flex items-center gap-2 text-blue-600 hover:underline">
+            <ArrowLeft size={18} /> Volver a cursos
+          </Link>
+        </div>
+      </div>
+    );
   }
 
-  if (loading) return <div className="p-8 text-center">Cargando...</div>;
-  if (!course) return <div className="p-8 text-center">Curso no encontrado</div>;
-
   return (
-    <div className="p-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/admin/courses" className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-            <ArrowLeft size={20} className="text-slate-600" />
-          </Link>
-          <h1 className="text-2xl font-bold text-slate-900">Editar Curso</h1>
-        </div>
+    <div className="min-h-screen bg-slate-50 p-8">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Link href="/admin/courses" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900">
+          <ArrowLeft size={18} />
+          Volver a cursos
+        </Link>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-6">
-              {error}
-            </div>
-          )}
-
-          <form action={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Título del Curso
-              </label>
-              <input
-                type="text"
-                name="title"
-                defaultValue={course.title}
-                required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Descripción
-              </label>
-              <textarea
-                name="description"
-                defaultValue={course.description}
-                required
-                rows={4}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-              />
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <button
-                type="submit"
-                disabled={saving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-              >
-                <Save size={18} />
-                {saving ? 'Guardando...' : 'Guardar Cambios'}
-              </button>
-            </div>
-          </form>
+          <h1 className="text-2xl font-bold text-slate-900 mb-6">Editar curso</h1>
+          <CourseForm
+            mode="edit"
+            courseId={course.id}
+            initialData={{
+              title: course.title,
+              description: course.description,
+            }}
+          />
         </div>
       </div>
     </div>

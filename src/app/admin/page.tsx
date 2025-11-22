@@ -1,8 +1,18 @@
 import Link from 'next/link';
-import { Users, BookOpen, TrendingUp, Settings, BarChart3 } from 'lucide-react';
+import { Users, BookOpen, TrendingUp, BarChart3 } from 'lucide-react';
 import { getAdminDashboardMetrics } from '@/actions/dashboards';
+import { getCurrentUser } from '@/actions/users';
+import { redirect } from 'next/navigation';
+
+async function requireAdmin() {
+  const user = await getCurrentUser();
+  if (!user) redirect('/auth/login');
+  if (user.role !== 'ADMIN') redirect('/dashboard');
+  return user;
+}
 
 export default async function AdminDashboardPage() {
+  await requireAdmin();
   const metrics = await getAdminDashboardMetrics();
 
   if ('error' in metrics) {

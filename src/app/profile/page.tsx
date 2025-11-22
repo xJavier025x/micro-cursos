@@ -3,19 +3,24 @@
 import { getCurrentUser, updateUserProfile, changeUserPassword } from '@/actions/users';
 import { User } from '@prisma/client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { User as UserIcon, Lock, Save } from 'lucide-react';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<Partial<User> | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     getCurrentUser().then((u) => {
       setUser(u);
       setLoading(false);
+      if (!u) {
+        router.replace('/auth/login');
+      }
     });
-  }, []);
+  }, [router]);
 
   async function handleUpdateProfile(formData: FormData) {
     if (!user?.id) return;
@@ -39,7 +44,7 @@ export default function ProfilePage() {
   }
 
   if (loading) return <div className="p-8 text-center">Cargando...</div>;
-  if (!user) return <div className="p-8 text-center">No se encontró el usuario</div>;
+  if (!user) return <div className="p-8 text-center">Redirigiendo...</div>;
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
