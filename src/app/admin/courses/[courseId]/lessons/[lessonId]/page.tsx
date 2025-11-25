@@ -1,8 +1,15 @@
 import Link from 'next/link';
-import { ChevronLeft, Save, FileText } from 'lucide-react';
+import { ChevronLeft, FileText } from 'lucide-react';
+import { getLessonById } from '@/actions/lessons';
+import { EditLessonForm } from '@/components/admin/EditLessonForm';
 
 export default async function EditLessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const { courseId, lessonId } = await params;
+  const lesson = await getLessonById(lessonId);
+
+  if (!lesson) {
+    return <div className="p-8 text-center">Lección no encontrada</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -22,51 +29,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ cou
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-          <h1 className="text-2xl font-bold text-slate-900 mb-8">Editar Lección {lessonId}</h1>
-
-          <form className="space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-slate-700 mb-1">
-                Título de la Lección
-              </label>
-              <input
-                type="text"
-                id="title"
-                defaultValue={`Lección ${lessonId}`}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="videoUrl" className="block text-sm font-medium text-slate-700 mb-1">
-                URL del Video (Opcional)
-              </label>
-              <input
-                type="url"
-                id="videoUrl"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="content" className="block text-sm font-medium text-slate-700 mb-1">
-                Contenido (Markdown)
-              </label>
-              <textarea
-                id="content"
-                rows={8}
-                defaultValue="Contenido existente..."
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono text-sm"
-              />
-            </div>
-
-            <div className="pt-4 flex justify-end">
-              <button type="submit" className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                <Save size={18} />
-                Guardar Cambios
-              </button>
-            </div>
-          </form>
+          <h1 className="text-2xl font-bold text-slate-900 mb-8">Editar: {lesson.title}</h1>
+          <EditLessonForm courseId={courseId} lesson={lesson} />
         </div>
       </div>
     </div>

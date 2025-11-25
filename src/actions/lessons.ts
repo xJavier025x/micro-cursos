@@ -56,7 +56,7 @@ export async function listLessonByCourse(courseId: string) {
 
 // --- 3.2 Write Actions (ADMIN) ---
 
-export async function createLesson(courseId: string, formData: FormData) {
+export async function createLesson(courseId: string, prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
   const result = lessonSchema.safeParse({
     ...data,
@@ -95,7 +95,7 @@ export async function createLesson(courseId: string, formData: FormData) {
   redirect(`/admin/courses/${courseId}/lessons`);
 }
 
-export async function updateLesson(lessonId: string, courseId: string, formData: FormData) {
+export async function updateLesson(lessonId: string, courseId: string, prevState: any, formData: FormData) {
   const data = Object.fromEntries(formData.entries());
   const result = lessonSchema.safeParse({
     ...data,

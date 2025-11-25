@@ -75,7 +75,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ courseId:
                 name="title"
                 defaultValue={course.title}
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
               />
             </div>
 
@@ -96,7 +96,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ courseId:
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50"
               >
                 <Save size={18} />
                 {saving ? 'Guardando...' : 'Guardar Cambios'}

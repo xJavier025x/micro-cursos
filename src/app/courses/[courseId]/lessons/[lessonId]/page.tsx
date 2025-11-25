@@ -4,6 +4,7 @@ import { getLessonById } from '@/actions/lessons';
 import { getLessonProgress, markLessonAsCompleted } from '@/actions/progress';
 import { getCurrentUser } from '@/actions/users';
 import { redirect } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 
 export default async function LessonPage({ params }: { params: Promise<{ courseId: string; lessonId: string }> }) {
   const { courseId, lessonId } = await params;
@@ -59,7 +60,7 @@ export default async function LessonPage({ params }: { params: Promise<{ courseI
         )}
 
         <article className="prose prose-slate max-w-none mb-12">
-          <div dangerouslySetInnerHTML={{ __html: lesson.content || '' }} />
+          <ReactMarkdown>{lesson.content || ''}</ReactMarkdown>
         </article>
       </main>
 

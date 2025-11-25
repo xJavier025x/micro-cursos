@@ -3,6 +3,9 @@ import { BookOpen, Award, Clock } from 'lucide-react';
 import { getUserDashboardData } from '@/actions/dashboards';
 import { getCurrentUser } from '@/actions/users';
 import { redirect } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -14,95 +17,84 @@ export default async function DashboardPage() {
   const dashboardData = await getUserDashboardData(user.id);
 
   if ('error' in dashboardData) {
-    return <div className="p-8 text-center text-red-600">Error al cargar el dashboard</div>;
+    return <div className="p-8 text-center text-destructive">Error al cargar el dashboard</div>;
   }
 
   const { courses, lastQuizResult, summary } = dashboardData;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-600">Micro-Cursos</h1>
-        <div className="flex gap-4">
-          <Link href="/courses" className="text-slate-600 hover:text-blue-600 font-medium">
-            Catálogo
-          </Link>
-          <Link href="/profile" className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold hover:bg-blue-200 transition-colors">
-            {user.name ? user.name[0].toUpperCase() : 'U'}
-          </Link>
-        </div>
-      </nav>
-
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <header className="mb-8">
-          <h2 className="text-3xl font-bold text-slate-900">Hola, {user.name || 'Usuario'}</h2>
-          <p className="text-slate-500">Aquí está tu resumen de aprendizaje.</p>
+    <div className="min-h-screen bg-slate-50 p-6">
+      <main className="max-w-7xl mx-auto space-y-8">
+        <header>
+          <h2 className="text-3xl font-bold tracking-tight">Hola, {user.name || 'Usuario'}</h2>
+          <p className="text-muted-foreground">Aquí está tu resumen de aprendizaje.</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-              <BookOpen size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 font-medium">Cursos Completados</p>
-              <p className="text-2xl font-bold text-slate-900">{summary.completedLessons}</p> {/* Note: Summary returns completed lessons count, not courses. Adjust label or logic if needed. The action returns completedLessons and activeCourses. Let's use completedLessons for now or activeCourses if label is Cursos Activos. The mock said Cursos Completados. Let's stick to completedLessons for "Lecciones Completadas" or change label. Let's change label to Lecciones Completadas to be accurate with action return */}
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Lecciones Completadas</CardTitle>
+              <BookOpen className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.completedLessons}</div>
+            </CardContent>
+          </Card>
           
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
-            <div className="p-3 bg-green-50 text-green-600 rounded-lg">
-              <Award size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 font-medium">Último Quiz</p>
-              <p className="text-2xl font-bold text-slate-900">
-                {lastQuizResult ? `${lastQuizResult.score}%` : '-'}
-              </p>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Último Quiz</CardTitle>
+              <Award className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{lastQuizResult ? `${lastQuizResult.score}%` : '-'}</div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
-            <div className="p-3 bg-orange-50 text-orange-600 rounded-lg">
-              <Clock size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 font-medium">Cursos Activos</p>
-              <p className="text-2xl font-bold text-slate-900">{summary.activeCourses}</p>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Cursos Activos</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.activeCourses}</div>
+            </CardContent>
+          </Card>
         </div>
 
-        <section>
-          <h3 className="text-xl font-bold text-slate-900 mb-4">Mis Cursos</h3>
+        <section className="space-y-4">
+          <h3 className="text-xl font-bold tracking-tight">Mis Cursos</h3>
           {courses.length === 0 ? (
-             <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
-               <p className="text-slate-500 mb-4">No estás inscrito en ningún curso aún.</p>
-               <Link href="/courses" className="text-blue-600 font-medium hover:underline">Explorar Catálogo</Link>
-             </div>
+             <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                   <p className="text-muted-foreground mb-4">No estás inscrito en ningún curso aún.</p>
+                   <Link href="/courses">
+                     <Button>Explorar Catálogo</Button>
+                   </Link>
+                </CardContent>
+             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {courses.map((course) => (
-                <div key={course.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-32 bg-slate-200 flex items-center justify-center text-slate-400">
+                <Card key={course.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="h-32 bg-muted flex items-center justify-center text-muted-foreground">
                     <BookOpen size={32} />
                   </div>
-                  <div className="p-5">
-                    <h4 className="font-bold text-lg text-slate-900 mb-2 line-clamp-1">{course.title}</h4>
-                    <div className="w-full bg-slate-100 rounded-full h-2 mb-4">
-                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${course.progress}%` }}></div>
-                    </div>
+                  <CardHeader>
+                    <CardTitle className="line-clamp-1">{course.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Progress value={course.progress} className="h-2" />
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-500">{course.progress}% Completado</span>
-                      <Link 
-                        href={`/courses/${course.id}`} 
-                        className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-                      >
-                        Continuar
+                      <span className="text-sm text-muted-foreground">{course.progress}% Completado</span>
+                      <Link href={`/courses/${course.id}`}>
+                        <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
+                            Continuar
+                        </Button>
                       </Link>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}

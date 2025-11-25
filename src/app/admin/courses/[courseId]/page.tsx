@@ -37,7 +37,7 @@ export default async function CourseStatsPage({ params }: { params: Promise<{ co
             </Link>
             <Link 
               href={`/admin/courses/${courseId}/edit`}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-colors flex items-center gap-2"
             >
               <Edit size={18} />
               Editar Detalles
@@ -49,7 +49,7 @@ export default async function CourseStatsPage({ params }: { params: Promise<{ co
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-500 font-medium">Completado por</h3>
-              <Users className="text-blue-500" size={24} />
+              <Users className="text-primary" size={24} />
             </div>
             <p className="text-3xl font-bold text-slate-900">{analytics.completedCourseCount}</p>
             <p className="text-sm text-slate-400 mt-2">Usuarios</p>
@@ -58,7 +58,7 @@ export default async function CourseStatsPage({ params }: { params: Promise<{ co
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-500 font-medium">Total Lecciones</h3>
-              <BookOpen className="text-orange-500" size={24} />
+              <BookOpen className="text-warning" size={24} />
             </div>
             <p className="text-3xl font-bold text-slate-900">{analytics.totalLessons}</p>
           </div>
@@ -66,7 +66,7 @@ export default async function CourseStatsPage({ params }: { params: Promise<{ co
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-slate-500 font-medium">Promedio Quiz</h3>
-              <BarChart3 className="text-green-500" size={24} />
+              <BarChart3 className="text-success" size={24} />
             </div>
             <p className="text-3xl font-bold text-slate-900">{analytics.averageScore}%</p>
           </div>
@@ -79,13 +79,13 @@ export default async function CourseStatsPage({ params }: { params: Promise<{ co
                <p className="text-2xl font-bold text-slate-700">{analytics.progressDistribution?.zero || 0}</p>
                <p className="text-sm text-slate-500">Sin Iniciar</p>
              </div>
-             <div className="p-4 bg-blue-50 rounded-lg">
-               <p className="text-2xl font-bold text-blue-700">{analytics.progressDistribution?.inProgress || 0}</p>
-               <p className="text-sm text-blue-500">En Progreso</p>
+             <div className="p-4 bg-primary-light rounded-lg">
+               <p className="text-2xl font-bold text-primary-hover">{analytics.progressDistribution?.inProgress || 0}</p>
+               <p className="text-sm text-primary">En Progreso</p>
              </div>
-             <div className="p-4 bg-green-50 rounded-lg">
-               <p className="text-2xl font-bold text-green-700">{analytics.progressDistribution?.completed || 0}</p>
-               <p className="text-sm text-green-500">Completado</p>
+             <div className="p-4 bg-success/10 rounded-lg">
+               <p className="text-2xl font-bold text-success">{analytics.progressDistribution?.completed || 0}</p>
+               <p className="text-sm text-success">Completado</p>
              </div>
           </div>
         </div>

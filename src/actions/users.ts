@@ -17,15 +17,17 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(6),
 });
 
+import { auth } from '@/auth';
+
 // --- 1.2 Profile Management ---
 
 export async function getCurrentUser() {
-  const session = (await cookies()).get('session')?.value;
-  if (!session) return null;
+  const session = await auth();
+  if (!session?.user?.id) return null;
 
   try {
     const user = await prisma.user.findUnique({
-      where: { id: session },
+      where: { id: session.user.id },
       select: { id: true, name: true, email: true, role: true },
     });
     return user;

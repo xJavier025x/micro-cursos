@@ -38,7 +38,7 @@ export default function NewCoursePage() {
                 type="text"
                 id="title"
                 name="title"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 placeholder="Ej: Seguridad Informática Básica"
                 required
                 minLength={3}
@@ -56,7 +56,7 @@ export default function NewCoursePage() {
                 id="description"
                 name="description"
                 rows={4}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none"
                 placeholder="Describe de qué trata este curso..."
                 required
                 minLength={10}
@@ -79,7 +79,7 @@ export default function NewCoursePage() {
               <button 
                 type="submit" 
                 disabled={isPending}
-                className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={18} />
                 {isPending ? 'Creando...' : 'Crear Curso'}

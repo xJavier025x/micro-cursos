@@ -172,13 +172,15 @@ export async function submitQuiz(quizId: string, answers: Record<string, string>
   }
 }
 
+import { auth } from '@/auth';
+
 export async function getUserQuizResults() {
   try {
-    const session = (await cookies()).get('session')?.value;
-    if (!session) return [];
+    const session = await auth();
+    if (!session?.user?.id) return [];
 
     const results = await prisma.quizResult.findMany({
-      where: { userId: session },
+      where: { userId: session.user.id },
       include: {
         quiz: {
           include: {

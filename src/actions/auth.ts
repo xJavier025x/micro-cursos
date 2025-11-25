@@ -1,90 +1,98 @@
 'use server';
 
-import { z } from 'zod';
+
+import { signIn, signOut } from '@/auth';
 import prisma from '@/lib/prisma';
-import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
-import bcrypt from 'bcryptjs';
-
-const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-  name: z.string().min(2),
-});
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
-
-export async function registerUser(formData: FormData) {
-  const data = Object.fromEntries(formData.entries());
-  const result = registerSchema.safeParse(data);
-
-  if (!result.success) {
-    return { error: result.error.flatten().fieldErrors };
-  }
-
+import bcryptjs from 'bcryptjs'
+ 
+// ...
+ 
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: { email: result.data.email },
+
+    // await sleep(2);
+    
+    await signIn('credentials', {
+      ...Object.fromEntries(formData),
+      redirect: false,
     });
 
-    if (existingUser) {
-      return { error: 'El usuario ya existe' };
+    return 'Success';
+
+
+  } catch (error) {
+    console.log(error);
+
+    return 'CredentialsSignin'
+
+
+  }
+}
+
+
+export const login = async(email:string, password: string) => {
+
+  try {
+
+    await signIn('credentials',{ email, password })
+
+    return {ok: true};
+    
+  } catch (error) {
+    console.log(error);
+    return {
+      ok: false,
+      message: 'No se pudo iniciar sesión'
     }
+    
+  }
+}
 
-    const hashedPassword = await bcrypt.hash(result.data.password, 10);
+// Logout
+export const logout = async() => {
 
-    await prisma.user.create({
+  await signOut({ redirectTo: '/' });
+
+
+}
+
+// Register
+export const registerUser = async( name: string, email: string, password: string ) => {
+
+
+  try {
+    
+    const user = await prisma.user.create({
       data: {
-        email: result.data.email,
-        password: hashedPassword,
-        name: result.data.name,
-        role: 'EMPLOYEE',
+        name: name,
+        email: email.toLowerCase(),
+        password: bcryptjs.hashSync( password ),
       },
-    });
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      }
+    })
 
-    return { success: true };
-  } catch (error) {
-    return { error: 'Error al registrar usuario' };
-  }
-}
-
-export async function loginUser(formData: FormData) {
-  const data = Object.fromEntries(formData.entries());
-  const result = loginSchema.safeParse(data);
-
-  if (!result.success) {
-    return { error: 'Credenciales inválidas' };
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email: result.data.email },
-    });
-
-    if (!user) {
-      return { error: 'Usuario no encontrado' };
+    return {
+      ok: true,
+      user: user,
+      message: 'Usuario creado'
     }
 
-    const isValid = await bcrypt.compare(result.data.password, user.password);
-
-    if (!isValid) {
-      return { error: 'Contraseña incorrecta' };
-    }
-
-    // TODO: Integrate with NextAuth v5 when available/configured
-    // For now, setting a simple cookie for demonstration
-    (await cookies()).set('session', user.id); // In production use secure session management
-
-    return { success: true, role: user.role };
   } catch (error) {
-    return { error: 'Error al iniciar sesión' };
-  }
-}
+    console.log(error);
 
-export async function logoutUser() {
-  (await cookies()).delete('session');
-  redirect('/auth/login');
+    return {
+      ok: false,
+      message: 'No se pudo crear el usuario'
+    }
+  }
+
+  
+
 }
