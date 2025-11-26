@@ -11,7 +11,7 @@ export const TopMenu = async () => {
   return (
     <nav className="flex justify-between items-center w-full px-5 py-4 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
       <div>
-        <Link href="/dashboard">
+        <Link href={isAuthenticated ? "/dashboard" : "/"}>
           <span className={`${titleFont.className} antialiased font-bold text-xl text-primary`}>Micro-Cursos</span>
         </Link>
       </div>
